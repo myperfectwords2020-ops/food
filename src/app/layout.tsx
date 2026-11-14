@@ -48,9 +48,8 @@ export const metadata: Metadata = {
   title: "Greencart",
   description: "Fresh groceries, delivered fast to your door.",
   authors: [{ name: "Greencart" }],
-  openGraph: { type: "website" },
-  twitter: { card: "summary_large_image", site: "@Lovable" },
-  icons: { icon: "/favicon.ico" },
+  openGraph: { type: "website", siteName: "Greencart" },
+  twitter: { card: "summary_large_image" },
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
