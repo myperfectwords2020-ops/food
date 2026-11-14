@@ -1,0 +1,116 @@
+---
+alwaysApply: true
+---
+---
+
+description: Testing requirements
+alwaysApply: true
+-----------------
+
+# Testing Rules
+
+Production functionality must be tested.
+
+---
+
+## Unit Tests
+
+Use unit tests for:
+
+* Business rules
+* Price calculation
+* Recommendation scoring
+* Lead classification
+* Automation conditions
+* Permission checks
+
+---
+
+## Integration Tests
+
+Test:
+
+* Database operations
+* Payment verification
+* Webhooks
+* AI tools
+* Automation execution
+* Notification services
+
+---
+
+## End-to-End Tests
+
+Critical flows must have E2E coverage.
+
+Required flows:
+
+```text
+Customer registration
+Product browsing
+Add to cart
+Checkout
+Successful payment
+Failed payment
+Order history
+
+AI product discovery
+AI recommendation
+
+Lead submission
+Automation execution
+
+Admin login
+Admin authorization
+```
+
+---
+
+## Security Tests
+
+Test:
+
+```text
+Unauthorized access
+Cross-tenant access
+Role escalation
+Price manipulation
+Invalid payment status
+Webhook forgery
+AI tool abuse
+Prompt injection
+Rate limits
+```
+
+---
+
+## Regression
+
+When fixing a bug:
+
+1. Reproduce the bug.
+2. Add a regression test.
+3. Fix the bug.
+4. Run the relevant test suite.
+
+---
+
+## Tests Before Completion
+
+A feature is not complete merely because it works manually.
+
+Before marking a feature complete:
+
+```text
+Implementation
++
+Validation
++
+Authorization
++
+Tests
++
+Error handling
+```
+
+must be considered.

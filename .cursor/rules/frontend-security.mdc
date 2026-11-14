@@ -1,0 +1,121 @@
+---
+alwaysApply: true
+---
+---
+description: Frontend security rules
+alwaysApply: true
+---
+
+# Frontend Security
+
+The frontend is an untrusted environment.
+
+Never assume data from the browser is trustworthy.
+
+## Secrets
+
+Never expose:
+
+- API secret keys
+- database credentials
+- Paystack secret keys
+- AI provider secret keys
+- webhook secrets
+- storage secret keys
+
+Only public client-safe configuration may use NEXT_PUBLIC_ variables.
+
+## Authentication
+
+Do not implement authentication security solely through UI hiding.
+
+This:
+
+if (!isAdmin) hide button
+
+is not authorization.
+
+The server must independently authorize every protected operation.
+
+## Authorization
+
+The frontend may hide unavailable actions for UX.
+
+The backend must enforce permissions.
+
+## Financial data
+
+Never trust client-provided:
+
+- price
+- subtotal
+- discount
+- delivery cost
+- total
+- payment status
+- inventory
+
+The server must calculate financial values.
+
+## User-controlled content
+
+Treat all user-generated content as untrusted.
+
+Do not use:
+
+dangerouslySetInnerHTML
+
+unless absolutely necessary and the content has been safely sanitized.
+
+## URLs
+
+Do not construct unsafe redirects from arbitrary user input.
+
+Validate redirect destinations.
+
+## File uploads
+
+Do not trust:
+
+- file extension
+- filename
+- MIME type supplied by the browser
+
+Server-side validation is required.
+
+## Sensitive data
+
+Do not put sensitive customer data into:
+
+- URLs
+- browser logs
+- analytics events
+- localStorage unnecessarily
+- query parameters unnecessarily
+
+## Error messages
+
+Never expose:
+
+- stack traces
+- database errors
+- internal identifiers unnecessarily
+- secret configuration
+- internal system details
+
+## AI
+
+AI-generated content is untrusted.
+
+Never render AI output as executable HTML or code.
+
+Never allow AI output to directly control:
+
+- database queries
+- shell commands
+- payment amounts
+- authorization
+- inventory
+- permissions
+
+AI actions must go through controlled application APIs.

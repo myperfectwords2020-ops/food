@@ -1,0 +1,105 @@
+---
+alwaysApply: true
+---
+---
+description: Accessibility requirements for production frontend
+alwaysApply: true
+---
+
+# Accessibility
+
+All production UI must meet modern accessibility expectations.
+
+## Semantic HTML
+
+Use appropriate semantic elements:
+
+- header
+- nav
+- main
+- section
+- article
+- footer
+- button
+- form
+- label
+
+Do not use divs as interactive controls.
+
+## Keyboard navigation
+
+Every interactive element must be keyboard accessible.
+
+Ensure:
+
+- visible focus
+- logical tab order
+- escape closes dialogs
+- keyboard navigation works in menus
+
+## Forms
+
+Every input must have an accessible label.
+
+Validation errors must be associated with the relevant field.
+
+Do not rely only on red borders.
+
+## Dialogs
+
+Dialogs must:
+
+- trap focus appropriately
+- restore focus when closed
+- have accessible names
+- support Escape
+
+## Images
+
+Every meaningful image requires appropriate alt text.
+
+Decorative images should use empty alt text where appropriate.
+
+## Color
+
+Never communicate information using color alone.
+
+Examples:
+
+Do not use only red to indicate an error.
+
+Use:
+
+- icon
+- text
+- color
+
+## Motion
+
+Respect:
+
+prefers-reduced-motion
+
+Do not create animations that can negatively affect usability.
+
+## Screen readers
+
+Important state changes should be announced appropriately.
+
+Examples:
+
+- successful cart addition
+- form submission failure
+- payment status
+- destructive action completion
+
+## Accessibility testing
+
+Before completing a feature, inspect:
+
+- keyboard navigation
+- focus states
+- form labels
+- contrast
+- screen-reader semantics
+- mobile accessibility

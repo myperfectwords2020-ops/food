@@ -1,0 +1,89 @@
+---
+alwaysApply: true
+---
+---
+description: Production frontend performance rules
+alwaysApply: true
+---
+
+# Frontend Performance
+
+Performance is a production requirement.
+
+## Server Components
+
+Prefer React Server Components.
+
+Use Client Components only when required.
+
+Do not make entire pages client components unnecessarily.
+
+## Data fetching
+
+Avoid duplicate API requests.
+
+Do not fetch the same data independently in multiple child components when it can be shared.
+
+## Images
+
+Use Next.js image optimization where applicable.
+
+Provide:
+
+- width
+- height
+- appropriate sizing
+- meaningful alt text
+
+Avoid loading unnecessarily large images.
+
+## Lists
+
+For large lists:
+
+- paginate
+- virtualize where appropriate
+- avoid rendering unnecessary records
+
+## Bundle size
+
+Do not add dependencies without justification.
+
+Prefer existing project utilities.
+
+Avoid importing entire libraries when only a small function is required.
+
+## Rendering
+
+Avoid unnecessary re-renders.
+
+Do not use memoization blindly.
+
+Optimize only when there is a demonstrated need.
+
+## Loading
+
+Use:
+
+- streaming
+- Suspense
+- skeletons
+- progressive loading
+
+where appropriate.
+
+## Admin dashboard
+
+Do not load every analytics dataset on initial page load.
+
+Load expensive dashboard sections independently where appropriate.
+
+## AI interface
+
+Do not render entire conversation history unnecessarily when conversations become large.
+
+Use pagination or virtualization when required.
+
+## Monitoring
+
+Important frontend errors should be observable in production through the application's error-monitoring strategy.

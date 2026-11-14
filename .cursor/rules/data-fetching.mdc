@@ -1,0 +1,48 @@
+---
+description: TanStack Query and client server-state rules
+alwaysApply: true
+---
+
+# Data fetching and TanStack Query
+
+TanStack Query manages client-side server state; it does not replace Next.js Server Components, the database, authentication, or backend authorization.
+
+## Defaults
+
+- Prefer Server Components for initial reads.
+- Use TanStack Query for interactive client server state (cart, checkout summary, admin tables, mutations).
+- Use local React state for UI-only concerns.
+
+## QueryClient
+
+- One browser `QueryClient` per session via `AppQueryProvider`.
+- Do not recreate `QueryClient` on every render.
+- Tests use `renderWithProviders` / `TestQueryProvider`.
+
+## Query keys
+
+- Define keys in `src/lib/query/query-keys.ts` (`cartKeys`, `checkoutKeys`, `adminKeys`).
+- Include filters, pagination, and stable cart line fingerprints in keys.
+- Do not store server state in React Context or global Redux for API data.
+
+## Mutations
+
+- Call server actions or APIs; never trust client-computed prices, totals, inventory, or payment status.
+- Use targeted `invalidateQueries` or `setQueryData` when the response is authoritative.
+- Optimistic updates must roll back on error.
+
+## Performance
+
+- Debounce search-driven queries (250–400ms) or use submit-based filters.
+- Bound pagination; never request unbounded lists from the client.
+- Avoid duplicate fetches and broad cache invalidation.
+
+## Security
+
+- Clear query cache on logout (`queryClient.clear()`).
+- Do not persist sensitive query data to localStorage.
+- Do not expose secrets to the client.
+
+## Documentation
+
+See `docs/data-fetching.md` for conventions and examples.

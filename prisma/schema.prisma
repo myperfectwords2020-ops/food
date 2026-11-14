@@ -1,0 +1,1187 @@
+// Élanskin platform — Phase 0 schema (multi-tenant-ready)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  STAFF
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  INVITED
+  DISABLED
+}
+
+enum TenantStatus {
+  ACTIVE
+  SUSPENDED
+  ARCHIVED
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  FAILED
+  REFUNDED
+}
+
+enum CartStatus {
+  ACTIVE
+  CHECKOUT
+  CONVERTED
+  ABANDONED
+  EXPIRED
+}
+
+enum InventoryReservationStatus {
+  ACTIVE
+  RELEASED
+  CONVERTED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+enum LeadLifecycleStage {
+  VISITOR
+  LEAD
+  QUALIFIED
+  CUSTOMER
+  REPEAT_CUSTOMER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  UNQUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum LeadSource {
+  WEBSITE
+  ROUTINE
+  AI_ASSISTANT
+  CAMPAIGN
+  SOCIAL
+  REFERRAL
+  MANUAL
+  CONTACT_FORM
+  NEWSLETTER
+}
+
+enum LeadActivityType {
+  CREATED
+  STATUS_CHANGED
+  ASSIGNED
+  NOTE_ADDED
+  CONTACTED
+  QUALIFIED
+  UNQUALIFIED
+  CONVERTED
+  LOST
+  SOURCE_UPDATED
+  SYSTEM_EVENT
+}
+
+enum ConversationChannel {
+  AI_ASSISTANT
+  WHATSAPP
+  EMAIL
+  WEB
+}
+
+enum ConversationStatus {
+  ACTIVE
+  HANDOFF_REQUESTED
+  HUMAN_ASSIGNED
+  RESOLVED
+  CLOSED
+}
+
+enum MessageRole {
+  CUSTOMER
+  AI
+  HUMAN
+  SYSTEM
+  INTERNAL_NOTE
+  TOOL
+}
+
+enum AutomationStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum AutomationRunStatus {
+  QUEUED
+  RUNNING
+  WAITING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum AutomationStepRunStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+enum NotificationChannel {
+  EMAIL
+  WHATSAPP
+  IN_APP
+  SMS
+}
+
+enum NotificationStatus {
+  QUEUED
+  PROCESSING
+  SENT
+  DELIVERED
+  FAILED
+  CANCELLED
+}
+
+enum NotificationPurpose {
+  TRANSACTIONAL
+  MARKETING
+  SUPPORT
+}
+
+enum NotificationTemplateStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum InventoryTransactionType {
+  ADJUSTMENT
+  SALE
+  RESTOCK
+  RETURN
+  RESERVATION
+  RELEASE
+}
+
+enum WebhookProcessingStatus {
+  RECEIVED
+  PROCESSED
+  FAILED
+  IGNORED
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum RoutineStep {
+  CLEANSE
+  TREAT
+  MOISTURIZE
+  PROTECT
+  TONER
+  EXFOLIATE
+  OTHER
+}
+
+model Tenant {
+  id        String       @id @default(cuid())
+  slug      String       @unique
+  name      String
+  status    TenantStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  users         User[]
+  customers     Customer[]
+  products      Product[]
+  orders        Order[]
+  leads         Lead[]
+  conversations Conversation[]
+  automations   Automation[]
+  settings      TenantSettings?
+  auditLogs     AuditLog[]
+  carts         Cart[]
+  categories    Category[]
+  deliveryRates DeliveryStateRate[]
+}
+
+model DeliveryStateRate {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  stateCode     String
+  stateName     String
+  deliveryMinor Int
+  enabled       Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([tenantId, stateCode])
+  @@index([tenantId])
+}
+
+model TenantSettings {
+  id        String   @id @default(cuid())
+  tenantId  String   @unique
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  timezone  String   @default("Africa/Lagos")
+  currency  String   @default("NGN")
+  branding  Json?
+  notifications Json?
+  integrations Json?
+  ai        Json?
+  automation Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id            String     @id @default(cuid())
+  tenantId      String?
+  tenant        Tenant?    @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  email         String
+  emailVerified DateTime?
+  passwordHash  String?
+  firstName     String?
+  lastName      String?
+  role          Role       @default(CUSTOMER)
+  status        UserStatus @default(ACTIVE)
+  image         String?
+  lastLoginAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  customer           Customer?
+  auditLogs          AuditLog[]           @relation("AuditActor")
+  assignedLeads      Lead[]               @relation("LeadOwner")
+  leadActivities     LeadActivity[]       @relation("LeadActivityActor")
+  passwordResetTokens PasswordResetToken[]
+  emailChangeTokens   EmailChangeToken[]
+  assignedConversations Conversation[]   @relation("ConversationAssignee")
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@index([role])
+  @@index([tenantId, status])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model EmailChangeToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  newEmail  String
+  tokenHash String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId    String?  @unique
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String
+  phone     String?
+  firstName String?
+  lastName  String?
+  lifecycle LeadLifecycleStage @default(VISITOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  addresses     Address[]
+  preferences   CustomerPreference?
+  orders        Order[]
+  carts         Cart[]
+  leads         Lead[]
+  conversations Conversation[]
+  recommendations CustomerRecommendation[]
+  tagAssignments CustomerTagAssignment[]
+  notifications Notification[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+  @@index([tenantId, createdAt])
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  tenantId   String
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  label      String?
+  firstName  String?
+  lastName   String?
+  phone      String?
+  street     String
+  line2      String?
+  city       String
+  state      String
+  postalCode String?
+  country    String   @default("NG")
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  orders Order[]
+
+  @@index([tenantId])
+  @@index([customerId])
+}
+
+model CustomerPreference {
+  id                      String    @id @default(cuid())
+  tenantId                String
+  customerId              String    @unique
+  customer                Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  emailOffers             Boolean   @default(false)
+  smsUpdates              Boolean   @default(false)
+  whatsappOffers          Boolean   @default(false)
+  fragranceFree           Boolean   @default(false)
+  routineReminders        Boolean   @default(true)
+  communicationChannel    String?
+  emailOffersConsentAt    DateTime?
+  whatsappOffersConsentAt DateTime?
+  marketingConsentVersion String?
+  skinProfile             Json?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  @@index([tenantId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name        String
+  slug        String
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  products Product[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, active])
+  @@index([tenantId, name])
+}
+
+model Product {
+  id                  String        @id @default(cuid())
+  tenantId            String
+  tenant              Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  categoryId          String?
+  category            Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  slug                String
+  name                String
+  shortDescription    String?
+  description         String        @db.Text
+  status              ProductStatus @default(DRAFT)
+  priceMinor          Int
+  compareAtPriceMinor Int?
+  currency            String        @default("NGN")
+  sku                 String?
+  stock               Int           @default(0)
+  reservedStock       Int           @default(0)
+  lowStockThreshold   Int           @default(5)
+  featured            Boolean       @default(false)
+  badge               String?
+  routineStep         RoutineStep?
+  usageInstructions   String?       @db.Text
+  warnings            String?       @db.Text
+  recommendationMeta  Json?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  images       ProductImage[]
+  ingredients  ProductIngredient[]
+  skinTypes    ProductSkinType[]
+  concerns     ProductConcern[]
+  cartItems    CartItem[]
+  orderItems   OrderItem[]
+  inventoryTx           InventoryTransaction[]
+  inventoryReservations InventoryReservation[]
+  relatedFrom  ProductRelation[] @relation("ProductRelatedFrom")
+  relatedTo    ProductRelation[] @relation("ProductRelatedTo")
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, sku])
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, categoryId])
+  @@index([tenantId, featured])
+  @@index([tenantId, status, featured, createdAt])
+  @@index([tenantId, status, priceMinor])
+  @@index([tenantId, status, categoryId])
+  @@index([tenantId, status, routineStep])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  tenantId  String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url        String
+  storageKey String?
+  alt        String?
+  sortOrder  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([productId])
+  @@index([productId, sortOrder])
+}
+
+model Ingredient {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+
+  products ProductIngredient[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model SkinType {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+
+  products ProductSkinType[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model SkinConcern {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  slug      String
+  createdAt DateTime @default(now())
+
+  products ProductConcern[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model ProductIngredient {
+  productId    String
+  ingredientId String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+  note         String?
+
+  @@id([productId, ingredientId])
+  @@index([ingredientId])
+}
+
+model ProductSkinType {
+  productId  String
+  skinTypeId String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  skinType   SkinType @relation(fields: [skinTypeId], references: [id], onDelete: Cascade)
+
+  @@id([productId, skinTypeId])
+  @@index([skinTypeId])
+}
+
+model ProductConcern {
+  productId String
+  concernId String
+  product   Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  concern   SkinConcern @relation(fields: [concernId], references: [id], onDelete: Cascade)
+
+  @@id([productId, concernId])
+  @@index([concernId])
+}
+
+model ProductRelation {
+  fromProductId String
+  toProductId   String
+  fromProduct   Product @relation("ProductRelatedFrom", fields: [fromProductId], references: [id], onDelete: Cascade)
+  toProduct     Product @relation("ProductRelatedTo", fields: [toProductId], references: [id], onDelete: Cascade)
+
+  @@id([fromProductId, toProductId])
+}
+
+model Cart {
+  id         String     @id @default(cuid())
+  tenantId   String
+  tenant     Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customerId String?
+  customer   Customer?  @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  sessionKey String?
+  status     CartStatus @default(ACTIVE)
+  currency   String     @default("NGN")
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  items CartItem[]
+
+  @@index([tenantId])
+  @@index([tenantId, customerId])
+  @@index([tenantId, sessionKey])
+  @@index([tenantId, status])
+  @@index([tenantId, customerId, status])
+  @@index([tenantId, sessionKey, status])
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  tenantId  String
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+  @@index([tenantId])
+  @@index([productId])
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  tenantId        String
+  tenant          Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customerId      String?
+  customer        Customer?   @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  addressId       String?
+  address         Address?    @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  orderNumber     String
+  status          OrderStatus @default(PENDING_PAYMENT)
+  currency        String      @default("NGN")
+  subtotalMinor   Int
+  deliveryMinor   Int         @default(0)
+  discountMinor   Int         @default(0)
+  taxMinor        Int         @default(0)
+  totalMinor      Int
+  customerEmail   String
+  customerPhone   String?
+  customerName    String?
+  deliveryMethod  String?
+  shippingFirstName String?
+  shippingLastName  String?
+  shippingPhone     String?
+  shippingLine1     String?
+  shippingLine2     String?
+  shippingCity      String?
+  shippingState     String?
+  shippingPostalCode String?
+  shippingCountry    String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  items                 OrderItem[]
+  payments              Payment[]
+  inventoryReservations InventoryReservation[]
+
+  @@unique([tenantId, orderNumber])
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, customerEmail])
+  @@index([tenantId, customerId])
+}
+
+model OrderItem {
+  id               String   @id @default(cuid())
+  tenantId         String
+  orderId          String
+  order            Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId        String?
+  product          Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productName      String
+  productSlug      String?
+  productSku       String?
+  unitPriceMinor   Int
+  quantity         Int
+  lineTotalMinor   Int
+  createdAt        DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([orderId])
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  tenantId              String
+  orderId               String
+  order                 Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  provider              String        @default("paystack")
+  status                PaymentStatus @default(PENDING)
+  amountMinor           Int
+  currency              String        @default("NGN")
+  providerReference     String?
+  providerTransactionId String?
+  paidAt                DateTime?
+  failureReason         String?
+  idempotencyKey        String?
+  metadata              Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@index([tenantId])
+  @@index([orderId])
+  @@index([tenantId, status])
+  @@unique([tenantId, idempotencyKey])
+  @@unique([tenantId, providerReference])
+}
+
+model DomainEventOutbox {
+  id            String    @id @default(cuid())
+  tenantId      String
+  type          String
+  payload       Json
+  correlationId String?
+  createdAt     DateTime  @default(now())
+  dispatchedAt  DateTime?
+
+  @@index([tenantId, createdAt])
+  @@index([dispatchedAt])
+}
+
+model Lead {
+  id            String             @id @default(cuid())
+  tenantId      String
+  tenant        Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customerId    String?
+  customer      Customer?          @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  ownerId       String?
+  owner         User?              @relation("LeadOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  firstName     String?
+  lastName      String?
+  name          String
+  email         String?
+  phone         String?
+  normalizedEmail String?
+  normalizedPhone String?
+  source        LeadSource         @default(WEBSITE)
+  sourceDetail  String?
+  status        LeadStatus         @default(NEW)
+  score         Int                @default(0)
+  scoreReasons  Json?
+  qualification String?
+  concern       String?
+  interest      String?
+  notes         Json?
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  utmTerm       String?
+  utmContent    String?
+  referrer      String?
+  landingPage   String?
+  marketingOptIn Boolean           @default(false)
+  marketingConsentAt DateTime?
+  marketingConsentSource String?
+  followUpAt    DateTime?
+  qualifiedAt   DateTime?
+  lostAt        DateTime?
+  convertedAt   DateTime?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+
+  conversations Conversation[]
+  activities    LeadActivity[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, source])
+  @@index([tenantId, email])
+  @@index([tenantId, normalizedEmail])
+  @@index([tenantId, normalizedPhone])
+  @@index([tenantId, ownerId])
+  @@index([tenantId, customerId])
+  @@index([tenantId, createdAt])
+}
+
+model LeadActivity {
+  id          String           @id @default(cuid())
+  tenantId    String
+  leadId      String
+  lead        Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type        LeadActivityType
+  actorUserId String?
+  actor       User?            @relation("LeadActivityActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  description String           @db.Text
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+
+  @@index([tenantId])
+  @@index([tenantId, leadId, createdAt])
+}
+
+model Conversation {
+  id                    String              @id @default(cuid())
+  tenantId              String
+  tenant                Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  customerId            String?
+  customer              Customer?           @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  leadId                String?
+  lead                  Lead?               @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  channel               ConversationChannel
+  status                ConversationStatus  @default(ACTIVE)
+  subject               String
+  contextSummary        String?             @db.Text
+  assignedToUserId      String?
+  assignedToUser        User?               @relation("ConversationAssignee", fields: [assignedToUserId], references: [id], onDelete: SetNull)
+  assignedAt            DateTime?
+  handoffRequestedAt    DateTime?
+  resolvedAt            DateTime?
+  closedAt              DateTime?
+  lastMessageAt         DateTime            @default(now())
+  lastCustomerMessageAt DateTime?
+  lastStaffMessageAt    DateTime?
+  unreadCustomerCount   Int                 @default(0)
+  unreadStaffCount      Int                 @default(0)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  messages Message[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, lastMessageAt])
+  @@index([tenantId, assignedToUserId])
+  @@index([tenantId, customerId])
+  @@index([tenantId, status, lastMessageAt])
+}
+
+model Message {
+  id               String       @id @default(cuid())
+  tenantId         String
+  conversationId   String
+  conversation     Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderUserId     String?
+  senderCustomerId String?
+  role             MessageRole
+  body             String       @db.Text
+  metadata         Json?
+  readAt           DateTime?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  @@index([tenantId])
+  @@index([conversationId, createdAt])
+  @@index([conversationId, createdAt, id])
+}
+
+model Automation {
+  id               String           @id @default(cuid())
+  tenantId         String
+  tenant           Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name             String
+  description      String?          @db.Text
+  status           AutomationStatus @default(DRAFT)
+  triggerType      String
+  triggerConfig    Json?
+  trigger          String
+  definition       Json
+  activeVersionId  String?          @unique
+  activeVersion    AutomationVersion? @relation("AutomationActiveVersion", fields: [activeVersionId], references: [id], onDelete: SetNull)
+  createdByUserId  String?
+  updatedByUserId  String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  versions AutomationVersion[] @relation("AutomationVersions")
+  runs     AutomationRun[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@index([tenantId, triggerType, status])
+}
+
+model AutomationVersion {
+  id              String     @id @default(cuid())
+  tenantId        String
+  automationId    String
+  automation      Automation @relation("AutomationVersions", fields: [automationId], references: [id], onDelete: Cascade)
+  version         Int
+  definition      Json
+  triggerType     String
+  triggerConfig   Json?
+  createdByUserId String?
+  createdAt       DateTime   @default(now())
+  publishedAt     DateTime?
+
+  runs              AutomationRun[]
+  activeForAutomation Automation? @relation("AutomationActiveVersion")
+
+  @@unique([automationId, version])
+  @@index([tenantId])
+  @@index([tenantId, triggerType])
+}
+
+model AutomationRun {
+  id                   String              @id @default(cuid())
+  tenantId             String
+  automationId         String
+  automation           Automation          @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  automationVersionId  String
+  automationVersion    AutomationVersion   @relation(fields: [automationVersionId], references: [id], onDelete: Restrict)
+  triggerEventId       String
+  status               AutomationRunStatus @default(QUEUED)
+  currentStepId        String?
+  contextSnapshot      Json?
+  message              String?
+  errorCode            String?
+  errorMessage         String?
+  attemptCount         Int                 @default(0)
+  causationId          String?
+  correlationId        String?
+  startedAt            DateTime            @default(now())
+  completedAt          DateTime?
+  failedAt             DateTime?
+  payload              Json?
+
+  stepRuns AutomationStepRun[]
+
+  @@unique([tenantId, automationId, automationVersionId, triggerEventId])
+  @@index([tenantId])
+  @@index([automationId, startedAt])
+  @@index([tenantId, status, startedAt])
+}
+
+model AutomationStepRun {
+  id              String                  @id @default(cuid())
+  tenantId        String
+  automationRunId String
+  automationRun   AutomationRun           @relation(fields: [automationRunId], references: [id], onDelete: Cascade)
+  stepId          String
+  stepType        String
+  status          AutomationStepRunStatus @default(PENDING)
+  input           Json?
+  output          Json?
+  attemptCount    Int                     @default(0)
+  errorCode       String?
+  errorMessage    String?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+
+  @@unique([automationRunId, stepId])
+  @@index([tenantId])
+  @@index([automationRunId, stepId])
+}
+
+model InternalNotification {
+  id           String   @id @default(cuid())
+  tenantId     String
+  userId       String?
+  title        String
+  body         String   @db.Text
+  resourceType String?
+  resourceId   String?
+  readAt       DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([tenantId, userId, createdAt])
+}
+
+model Notification {
+  id                String              @id @default(cuid())
+  tenantId          String
+  customerId        String?
+  customer          Customer?           @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  userId            String?
+  channel           NotificationChannel
+  type              String
+  purpose           NotificationPurpose @default(TRANSACTIONAL)
+  status            NotificationStatus  @default(QUEUED)
+  templateId        String?
+  template          NotificationTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  templateVersion   Int?
+  provider          String?
+  providerMessageId String?
+  recipient         String
+  subject           String?
+  payload           Json
+  metadata          Json?
+  idempotencyKey    String?
+  scheduledAt       DateTime?
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  failedAt          DateTime?
+  failureCode       String?
+  failureReason     String?
+  readAt            DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@unique([tenantId, idempotencyKey])
+  @@index([tenantId, status])
+  @@index([tenantId, customerId, createdAt])
+  @@index([tenantId, channel])
+  @@index([tenantId, type])
+  @@index([tenantId, scheduledAt])
+  @@index([providerMessageId])
+}
+
+model NotificationTemplate {
+  id                 String                     @id @default(cuid())
+  tenantId           String
+  key                String
+  name               String
+  channel            NotificationChannel
+  subject            String?
+  body               String                     @db.Text
+  providerTemplateId String?
+  version            Int                        @default(1)
+  status             NotificationTemplateStatus @default(DRAFT)
+  variables          Json?
+  createdAt          DateTime                   @default(now())
+  updatedAt          DateTime                   @updatedAt
+
+  notifications Notification[]
+
+  @@unique([tenantId, key, channel, version])
+  @@index([tenantId, key, channel, status])
+}
+
+model CustomerTag {
+  id        String   @id @default(cuid())
+  tenantId  String
+  slug      String
+  label     String
+  createdAt DateTime @default(now())
+
+  assignments CustomerTagAssignment[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId])
+}
+
+model CustomerTagAssignment {
+  id         String      @id @default(cuid())
+  tenantId   String
+  customerId String
+  customer   Customer    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tagId      String
+  tag        CustomerTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt  DateTime    @default(now())
+
+  @@unique([tenantId, customerId, tagId])
+  @@index([tenantId, customerId])
+}
+
+model InventoryReservation {
+  id        String                     @id @default(cuid())
+  tenantId  String
+  productId String
+  product   Product                    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderId   String?
+  order     Order?                     @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  quantity  Int
+  status    InventoryReservationStatus @default(ACTIVE)
+  expiresAt DateTime
+  createdAt DateTime                   @default(now())
+
+  @@index([tenantId, status, expiresAt])
+  @@index([orderId])
+  @@index([productId])
+}
+
+model InventoryTransaction {
+  id            String                   @id @default(cuid())
+  tenantId      String
+  productId     String
+  product       Product                  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type          InventoryTransactionType
+  delta         Int
+  balanceAfter  Int
+  note          String?
+  referenceType String?
+  referenceId   String?
+  actorUserId   String?
+  createdAt     DateTime                 @default(now())
+
+  @@index([tenantId])
+  @@index([productId, createdAt])
+  @@index([tenantId, referenceType, referenceId])
+}
+
+model CustomerRecommendation {
+  id         String   @id @default(cuid())
+  tenantId   String
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  profile    Json
+  results    Json
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId, customerId, createdAt])
+}
+
+enum AnalyticsEventType {
+  PRODUCT_VIEW
+  STOREFRONT_ADD_TO_CART
+  ASSISTANT_ADD_TO_CART
+  ASSISTANT_RECOMMENDATION_CLICK
+  ASSISTANT_ORDER_ATTRIBUTED
+}
+
+model AnalyticsEvent {
+  id             String             @id @default(cuid())
+  tenantId       String
+  eventType      AnalyticsEventType
+  productId      String?
+  customerId     String?
+  sessionKey     String?
+  conversationId String?
+  orderId        String?
+  metadata       Json?
+  createdAt      DateTime           @default(now())
+
+  @@index([tenantId, eventType, createdAt])
+  @@index([tenantId, productId, createdAt])
+  @@index([tenantId, customerId, createdAt])
+  @@index([tenantId, orderId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  tenantId   String?
+  tenant     Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  actorId    String?
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model WebhookEvent {
+  id          String                  @id @default(cuid())
+  tenantId    String?
+  provider    String
+  eventType   String
+  externalId  String?
+  payload     Json
+  status      WebhookProcessingStatus @default(RECEIVED)
+  processedAt DateTime?
+  createdAt   DateTime                @default(now())
+
+  @@index([provider, externalId])
+  @@index([tenantId, createdAt])
+}
+
+model IdempotencyKey {
+  id        String   @id @default(cuid())
+  tenantId  String
+  scope     String
+  key       String
+  response  Json?
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@unique([tenantId, scope, key])
+  @@index([expiresAt])
+}

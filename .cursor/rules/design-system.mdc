@@ -1,0 +1,187 @@
+---
+alwaysApply: true
+---
+---
+description: Production design system and visual consistency
+alwaysApply: true
+---
+
+# Design System Rules
+
+The application must have one coherent visual language.
+
+Do not invent new visual styles for individual pages.
+
+## Brand direction
+
+The skincare storefront should feel:
+
+- premium
+- warm
+- elegant
+- modern
+- trustworthy
+- editorial
+- minimal
+
+The admin application should feel:
+
+- professional
+- sophisticated
+- operational
+- clean
+- data-focused
+
+Avoid:
+
+- generic SaaS purple gradients
+- neon colors
+- excessive glassmorphism
+- excessive shadows
+- childish rounded interfaces
+- inconsistent border radii
+- random colors
+- unnecessary animations
+
+## Tokens
+
+Use centralized design tokens for:
+
+- colors
+- typography
+- spacing
+- radius
+- shadows
+- borders
+- transitions
+
+Do not hardcode arbitrary colors throughout components.
+
+Use the existing Tailwind/theme tokens.
+
+If a new token is required, add it centrally rather than introducing one-off values.
+
+## Typography
+
+Use the established typography hierarchy.
+
+Do not introduce random font sizes.
+
+Maintain consistent:
+
+- display
+- h1
+- h2
+- h3
+- body
+- small
+- label
+- caption
+
+## Spacing
+
+Use the established spacing scale.
+
+Avoid arbitrary margins such as:
+
+mt-[37px]
+
+unless there is a strong design reason.
+
+Prefer the project's spacing tokens.
+
+## Buttons
+
+Use the shared button component.
+
+Do not create custom button styles inside individual pages unless a genuinely new variant is required.
+
+Buttons must have:
+
+- default
+- hover
+- active
+- disabled
+- loading
+states where applicable.
+
+## Forms
+
+Use consistent:
+
+- labels
+- inputs
+- validation messages
+- helper text
+- focus states
+
+## Cards
+
+Cards should use consistent:
+
+- border
+- radius
+- padding
+- background
+- hover behavior
+
+Do not create a different card style for every dashboard section.
+
+## Tables
+
+Use a shared table pattern.
+
+Tables must support:
+
+- loading
+- empty
+- error
+- pagination where appropriate
+- responsive behavior
+
+## Status badges
+
+Use semantic status styles.
+
+Examples:
+
+SUCCESS
+WARNING
+ERROR
+INFO
+NEUTRAL
+
+Do not invent random colors for individual statuses.
+
+## Icons
+
+Use one icon library consistently.
+
+Do not mix multiple unrelated icon libraries.
+
+Icons should support the content rather than dominate it.
+
+## Animation
+
+Use subtle transitions.
+
+Avoid unnecessary animation.
+
+Respect reduced-motion preferences.
+
+## Design preservation
+
+When implementing functionality into Lovable-generated UI:
+
+DO NOT redesign the interface unless explicitly instructed.
+
+Preserve the established:
+
+- colors
+- typography
+- spacing
+- component appearance
+- layout
+- responsive behavior
+
+The existing UI is the visual source of truth.

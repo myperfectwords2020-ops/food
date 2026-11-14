@@ -1,0 +1,213 @@
+---
+alwaysApply: true
+---
+---
+description: Production frontend architecture and UI implementation rules
+alwaysApply: true
+---
+
+# Production UI Architecture
+
+## Core principle
+
+The frontend is a production application, not a prototype.
+
+Prioritize:
+
+- maintainability
+- consistency
+- accessibility
+- performance
+- responsive behavior
+- type safety
+- predictable state management
+- reusable components
+
+Do not sacrifice architecture for speed of implementation.
+
+## Framework
+
+Use:
+
+- Next.js App Router
+- TypeScript
+- React
+- Tailwind CSS
+- shadcn/ui where appropriate
+
+Prefer Server Components by default.
+
+Use Client Components only when interactivity, browser APIs, local state, or event handlers require them.
+
+Do not add `"use client"` unnecessarily.
+
+## Application structure
+
+Organize frontend code by domain.
+
+Preferred structure:
+
+src/
+├── app/
+├── components/
+│   ├── ui/
+│   ├── layout/
+│   ├── storefront/
+│   ├── account/
+│   ├── admin/
+│   └── shared/
+├── hooks/
+├── lib/
+├── modules/
+├── services/
+├── types/
+└── config/
+
+Do not create large monolithic components.
+
+## Component rules
+
+Components should have one clear responsibility.
+
+Avoid components larger than necessary.
+
+When a component becomes difficult to understand, extract logical subcomponents.
+
+Do not duplicate UI patterns.
+
+Before creating a new component, check whether an existing reusable component already solves the problem.
+
+## Data fetching
+
+Do not fetch data directly inside presentational components when the data can be provided by a parent/server layer.
+
+Separate:
+
+- data fetching
+- business logic
+- presentation
+
+Use typed API/service interfaces.
+
+## API boundary
+
+Never allow UI components to directly contain database logic.
+
+The frontend communicates through application APIs/services.
+
+Do not import Prisma into React components.
+
+Do not access PostgreSQL from client-side code.
+
+## Forms
+
+Use a consistent form architecture.
+
+Prefer:
+
+- React Hook Form
+- Zod validation
+
+Client validation improves UX.
+
+Server validation remains authoritative.
+
+Never assume client validation is security.
+
+## State
+
+Use local component state for local UI state.
+
+Use shared state only when necessary.
+
+Do not introduce a global state library simply because it is available.
+
+## Loading
+
+Every asynchronous UI must have an appropriate loading state.
+
+Prefer skeletons for content-heavy interfaces.
+
+Use spinners for short actions.
+
+## Error handling
+
+Every important asynchronous operation must have an error state.
+
+Never silently swallow errors.
+
+Never expose raw backend errors to users.
+
+## Empty states
+
+Design intentional empty states.
+
+Examples:
+
+- empty cart
+- no orders
+- no products
+- no search results
+- no leads
+- no conversations
+- no automation runs
+
+## Responsive behavior
+
+Design mobile-first.
+
+Do not simply shrink desktop layouts.
+
+Every page must be intentionally usable at:
+
+- mobile
+- tablet
+- desktop
+
+## Accessibility
+
+All interactive elements must be keyboard accessible.
+
+Use semantic HTML.
+
+Use accessible labels.
+
+Do not rely only on color.
+
+## Routing
+
+Use meaningful routes.
+
+Customer:
+
+/shop
+/products/[slug]
+/categories/[slug]
+/cart
+/checkout
+/account
+
+Admin:
+
+/admin
+/admin/products
+/admin/orders
+/admin/customers
+/admin/leads
+/admin/conversations
+/admin/automations
+/admin/analytics
+
+## Production rule
+
+Do not rewrite existing working UI unnecessarily.
+
+When implementing backend functionality into an existing Lovable-generated interface:
+
+- preserve the visual design
+- preserve spacing
+- preserve typography
+- preserve component hierarchy
+- preserve responsive behavior
+
+Only modify the UI when required for functionality, accessibility, security, or correctness.

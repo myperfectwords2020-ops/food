@@ -1,0 +1,143 @@
+---
+alwaysApply: true
+---
+---
+
+description: Core architecture rules for the skincare AI commerce platform
+alwaysApply: true
+-----------------
+
+# Architecture Rules
+
+## Project
+
+This is a production-grade AI skincare commerce and automation platform.
+
+The application must prioritize:
+
+* Security
+* Data integrity
+* Maintainability
+* Testability
+* Clear domain boundaries
+* Production reliability
+
+Do not optimize for rapid code generation at the expense of architecture.
+
+---
+
+## Technology
+
+Use:
+
+* Next.js
+* TypeScript
+* PostgreSQL
+* Prisma
+* Redis
+* BullMQ
+* Tailwind CSS
+* shadcn/ui
+* Zod
+
+Do not introduce another framework or ORM without explicit justification.
+
+---
+
+## Domain Architecture
+
+Organize backend logic by business domain.
+
+Preferred structure:
+
+```text
+src/modules/
+
+auth/
+tenants/
+users/
+customers/
+products/
+cart/
+checkout/
+orders/
+payments/
+leads/
+conversations/
+ai/
+automations/
+notifications/
+analytics/
+```
+
+Each module should separate:
+
+```text
+validation
+types
+services
+repositories
+tests
+```
+
+Do not place business logic directly inside React components.
+
+Do not put large amounts of business logic inside route handlers.
+
+---
+
+## Request Architecture
+
+Use:
+
+```text
+Request
+ ↓
+Authentication
+ ↓
+Authorization
+ ↓
+Validation
+ ↓
+Service
+ ↓
+Repository
+ ↓
+Database
+```
+
+Route handlers should be thin.
+
+---
+
+## Database
+
+PostgreSQL is the source of truth.
+
+Prisma is the primary database access layer.
+
+Do not use Redis as a permanent source of business data.
+
+Do not duplicate authoritative business state across systems unnecessarily.
+
+---
+
+## Multi-Tenancy
+
+All tenant-owned resources must be tenant-scoped.
+
+Never retrieve a tenant-owned resource using only its ID when the current tenant context is available.
+
+Prefer:
+
+```text
+getProduct(productId, tenantId)
+```
+
+over:
+
+```text
+getProduct(productId)
+```
+
+Tenant isolation must be enforced server-

@@ -1,0 +1,168 @@
+---
+alwaysApply: true
+---
+---
+
+description: PostgreSQL and Prisma rules
+alwaysApply: true
+-----------------
+
+# Database Rules
+
+## General
+
+PostgreSQL(neon) is the authoritative business database.
+
+Use Prisma for normal application database access.
+
+---
+
+## Schema Design
+
+Prefer normalized relational data.
+
+Avoid storing important relational business data as arbitrary JSON when a proper relational structure is appropriate.
+
+JSON may be used for genuinely flexible configuration or external payloads.
+
+---
+
+## IDs
+
+Use stable primary keys.
+
+Do not expose sequential internal IDs unnecessarily through public APIs.
+
+---
+
+## Tenant Ownership
+
+Tenant-owned models must have a tenant relationship.
+
+Examples:
+
+```text
+Product
+Customer
+Order
+Lead
+Conversation
+Automation
+```
+
+must be associated with a tenant.
+
+---
+
+## Timestamps
+
+Important models should normally contain:
+
+```text
+createdAt
+updatedAt
+```
+
+Use UTC timestamps at the database/application layer.
+
+---
+
+## Money
+
+Never use floating-point numbers for monetary values.
+
+Use integer minor units.
+
+Example:
+
+```text
+₦18,000
+```
+
+should be represented as:
+
+```text
+1800000
+```
+
+if using kobo as the currency minor unit.
+
+Store currency separately where multi-currency support is possible.
+
+---
+
+## Orders
+
+Order items must preserve historical pricing.
+
+Do not rely on the current Product price when displaying historical orders.
+
+---
+
+## Payments
+
+Payment records must be separate from orders.
+
+An order may have multiple payment attempts.
+
+Do not assume:
+
+```text
+one order = one payment record
+```
+
+---
+
+## Inventory
+
+Inventory changes must be handled transactionally.
+
+Avoid race conditions when multiple customers purchase the same product.
+
+---
+
+## Soft Deletion
+
+Use archival/status fields for business records where historical references are required.
+
+Do not casually hard-delete:
+
+* Orders
+* Payments
+* Financial records
+
+---
+
+## Indexes
+
+Add indexes to frequently queried fields.
+
+Potential indexes include:
+
+```text
+tenantId
+email
+phone
+status
+createdAt
+productId
+customerId
+orderId
+```
+
+Do not create indexes blindly.
+
+---
+
+## Migrations
+
+Never manually modify the production database schema without a migration.
+
+Use Prisma migrations.
+
+Every schema change must consider:
+
+* Existing data
+* Backwards compatibility
+* Deployment order
+* Rollback strategy

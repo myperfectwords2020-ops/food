@@ -1,0 +1,92 @@
+---
+alwaysApply: true
+---
+---
+description: Production UI testing standards
+alwaysApply: true
+---
+
+# UI Testing
+
+Every production UI feature must have appropriate tests.
+
+## Component tests
+
+Test important reusable components:
+
+- forms
+- product cards
+- cart components
+- filters
+- dialogs
+- tables
+- workflow nodes
+
+## Interaction tests
+
+Test:
+
+- adding to cart
+- removing from cart
+- quantity changes
+- filtering
+- search
+- checkout navigation
+- form validation
+- AI interactions
+- admin actions
+
+## E2E
+
+Critical customer journeys must have E2E coverage.
+
+Customer:
+
+1. Browse products
+2. Search
+3. Filter
+4. View product
+5. Add to cart
+6. Checkout
+7. Complete payment flow
+
+Admin:
+
+1. Login
+2. View dashboard
+3. Create product
+4. Edit product
+5. Manage inventory
+6. View order
+7. Manage customer
+8. Manage lead
+9. Configure automation
+
+## Responsive testing
+
+Critical pages must be tested at:
+
+- mobile
+- tablet
+- desktop
+
+## Accessibility testing
+
+Test:
+
+- keyboard navigation
+- accessible names
+- form labels
+- focus behavior
+- dialog behavior
+
+## Regression
+
+When fixing a UI bug:
+
+1. Reproduce the bug.
+2. Fix it.
+3. Add a regression test.
+4. Verify the test passes.
+
+Do not remove tests to make a build pass.
