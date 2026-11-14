@@ -60,8 +60,8 @@ export function OrderAdminActions({
         </p>
       </div>
       {nextStatusOptions.length > 0 ? (
-        <label className="field min-w-[200px]">
-          <span htmlFor="order-next-status">Move to</span>
+        <label className="field min-w-[200px]" htmlFor="order-next-status">
+          <span>Move to</span>
           <select
             id="order-next-status"
             value={status}
@@ -80,12 +80,14 @@ export function OrderAdminActions({
           </select>
         </label>
       ) : (
-        <p className="text-xs text-muted-foreground m-0">No further status changes for this order.</p>
+        <p className="text-xs text-muted-foreground m-0">
+          No further status changes for this order.
+        </p>
       )}
       {initialStatus === "paid" && nextStatusOptions.length > 0 ? (
         <p className="text-xs text-muted-foreground w-full m-0">
-          Payment is complete. Choose the delivery stage — you can jump to &quot;Out for delivery&quot;
-          or &quot;Delivered&quot; without saving each step separately.
+          Payment is complete. Choose the delivery stage — you can jump to &quot;Out for
+          delivery&quot; or &quot;Delivered&quot; without saving each step separately.
         </p>
       ) : null}
       {target && !isCancel ? (

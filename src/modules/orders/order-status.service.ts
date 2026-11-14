@@ -30,7 +30,12 @@ export function adminSelectableOrderTargets(current: OrderStatus): OrderStatus[]
   if (current === "PENDING_PAYMENT") {
     return ["CANCELLED"];
   }
-  if (current === "DELIVERED" || current === "CANCELLED" || current === "REFUNDED" || current === "FAILED") {
+  if (
+    current === "DELIVERED" ||
+    current === "CANCELLED" ||
+    current === "REFUNDED" ||
+    current === "FAILED"
+  ) {
     return [];
   }
 
@@ -38,13 +43,9 @@ export function adminSelectableOrderTargets(current: OrderStatus): OrderStatus[]
   const options: OrderStatus[] =
     idx >= 0 ? FULFILLMENT_PIPELINE.slice(idx + 1) : allowedNextOrderStatuses(current);
 
-  const filtered = options.filter((next) => {
-    if (current === "PENDING_PAYMENT" && next === "PAID") return false;
-    if (next === "FAILED") return false;
-    return true;
-  });
+  const filtered = options.filter((next) => next !== "FAILED");
 
-  if (current !== "CANCELLED" && current !== "DELIVERED" && !filtered.includes("CANCELLED")) {
+  if (!filtered.includes("CANCELLED")) {
     filtered.push("CANCELLED");
   }
 
