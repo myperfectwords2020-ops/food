@@ -51,39 +51,39 @@ export function AddToCartControl({
 
   return (
     <>
-    <div className={compact ? "flex flex-col gap-2" : "purchase-row"}>
-      <div className="quantity">
-        <button
-          type="button"
-          aria-label="Decrease quantity"
-          onClick={() => setQty(Math.max(1, qty - 1))}
-        >
-          <Minus size={14} />
-        </button>
-        <span aria-live="polite">{qty}</span>
-        <button
-          type="button"
-          aria-label="Increase quantity"
-          onClick={() => setQty(Math.min(maxQuantity, qty + 1))}
-        >
-          <Plus size={14} />
-        </button>
-      </div>
-      <Button type="button" onClick={handleApply}>
-        {inBag && qty === cartQuantity
-          ? `${cartQuantity} in bag · ${formatNaira(unitPrice * cartQuantity)}`
-          : inBag
-            ? `Update bag · ${formatNaira(unitPrice * qty)}`
-            : `Add to bag · ${formatNaira(unitPrice * qty)}`}
-      </Button>
-    </div>
-    {showBuyNow ? (
-      <div className="flex gap-2 mt-3">
-        <Button type="button" variant="outline" className="flex-1" onClick={handleBuyNow}>
-          Buy now
+      <div className={compact ? "flex flex-col gap-2" : "purchase-row"}>
+        <div className="quantity">
+          <button
+            type="button"
+            aria-label="Decrease quantity"
+            onClick={() => setQty(Math.max(1, qty - 1))}
+          >
+            <Minus size={14} />
+          </button>
+          <span aria-live="polite">{qty}</span>
+          <button
+            type="button"
+            aria-label="Increase quantity"
+            onClick={() => setQty(Math.min(maxQuantity, qty + 1))}
+          >
+            <Plus size={14} />
+          </button>
+        </div>
+        <Button type="button" onClick={handleApply}>
+          {inBag && qty === cartQuantity
+            ? `${cartQuantity} in bag · ${formatNaira(unitPrice * cartQuantity)}`
+            : inBag
+              ? `Update bag · ${formatNaira(unitPrice * qty)}`
+              : `Add to bag · ${formatNaira(unitPrice * qty)}`}
         </Button>
       </div>
-    ) : null}
+      {showBuyNow ? (
+        <div className="flex gap-2 mt-3">
+          <Button type="button" variant="outline" className="flex-1" onClick={handleBuyNow}>
+            Buy now
+          </Button>
+        </div>
+      ) : null}
     </>
   );
 }

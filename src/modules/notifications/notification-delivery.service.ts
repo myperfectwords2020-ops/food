@@ -75,7 +75,12 @@ export async function processNotificationDelivery(notificationId: string) {
     throw new Error("CHANNEL_UNSUPPORTED");
   } catch (err) {
     const message = err instanceof Error ? err.message : "Delivery failed";
-    const permanent = ["EMAIL_NOT_CONFIGURED", "WHATSAPP_NOT_CONFIGURED", "INVALID_PHONE", "CHANNEL_UNSUPPORTED"].includes(message);
+    const permanent = [
+      "EMAIL_NOT_CONFIGURED",
+      "WHATSAPP_NOT_CONFIGURED",
+      "INVALID_PHONE",
+      "CHANNEL_UNSUPPORTED",
+    ].includes(message);
     await prisma.notification.update({
       where: { id: notificationId },
       data: {
@@ -85,7 +90,11 @@ export async function processNotificationDelivery(notificationId: string) {
         failureReason: message.slice(0, 500),
       },
     });
-    logger.error("notification_delivery_failed", { tenantId: row.tenantId, operation: notificationId }, { error: message });
+    logger.error(
+      "notification_delivery_failed",
+      { tenantId: row.tenantId, operation: notificationId },
+      { error: message },
+    );
     if (!permanent) throw err;
   }
 }

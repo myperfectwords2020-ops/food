@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildAnalyticsCsv,
-  escapeCsvCell,
-} from "@/modules/analytics/analytics-csv-export.service";
+import { buildAnalyticsCsv, escapeCsvCell } from "@/modules/analytics/analytics-csv-export.service";
 import type { AnalyticsSnapshot } from "@/types/admin";
 
 describe("analytics CSV export", () => {

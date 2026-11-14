@@ -18,22 +18,22 @@ Never call Prisma from presentational React components.
 
 ## Key directories
 
-| Path                   | Purpose                                                 |
-| ---------------------- | ------------------------------------------------------- |
-| `src/app/`             | Routes and UI (unchanged visually)                      |
-| `src/modules/`         | Domain services (payments, notifications, AI, analytics) |
-| `src/modules/analytics/` | Phase 11 reporting aggregates (tenant-scoped)          |
-| `src/lib/db/`          | Prisma singleton                                        |
-| `src/lib/auth/`        | NextAuth config, permissions, tenant context            |
-| `src/lib/errors/`      | `AppError` hierarchy                                    |
-| `src/lib/logger/`      | Structured JSON logging                                 |
-| `src/lib/events/`      | In-process domain events (BullMQ wiring later)          |
-| `src/lib/redis/`       | Optional Redis client                                   |
-| `src/lib/storage/`     | Storage abstraction + upload limits                     |
-| `src/lib/security/`    | Tenant scope, rate-limit stub                           |
-| `src/workers/`         | BullMQ queue/worker entry                               |
-| `src/config/env.ts`    | Zod-validated environment                               |
-| `prisma/schema.prisma` | Multi-tenant data model                                 |
+| Path                     | Purpose                                                  |
+| ------------------------ | -------------------------------------------------------- |
+| `src/app/`               | Routes and UI (unchanged visually)                       |
+| `src/modules/`           | Domain services (payments, notifications, AI, analytics) |
+| `src/modules/analytics/` | Phase 11 reporting aggregates (tenant-scoped)            |
+| `src/lib/db/`            | Prisma singleton                                         |
+| `src/lib/auth/`          | NextAuth config, permissions, tenant context             |
+| `src/lib/errors/`        | `AppError` hierarchy                                     |
+| `src/lib/logger/`        | Structured JSON logging                                  |
+| `src/lib/events/`        | In-process domain events (BullMQ wiring later)           |
+| `src/lib/redis/`         | Optional Redis client                                    |
+| `src/lib/storage/`       | Storage abstraction + upload limits                      |
+| `src/lib/security/`      | Tenant scope, rate-limit stub                            |
+| `src/workers/`           | BullMQ queue/worker entry                                |
+| `src/config/env.ts`      | Zod-validated environment                                |
+| `prisma/schema.prisma`   | Multi-tenant data model                                  |
 
 ## Multi-tenancy
 

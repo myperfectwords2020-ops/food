@@ -39,9 +39,6 @@ describe("SessionHeaderActions", () => {
 
     renderWithProviders(<SessionHeaderActions />);
 
-    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute(
-      "href",
-      "/account/login",
-    );
+    expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/account/login");
   });
 });

@@ -147,7 +147,10 @@ function AnalyticsContent() {
                 Leads: {a.leads} · Qualified: {a.qualifiedLeads} · Conversion: {a.conversionRate}%
               </p>
               {leadChartSeries.length === 0 ? (
-                <EmptyState title="No leads in range" copy="Lead sources appear as CRM captures grow." />
+                <EmptyState
+                  title="No leads in range"
+                  copy="Lead sources appear as CRM captures grow."
+                />
               ) : (
                 <AdminAccessibleChart title="Lead sources" series={leadChartSeries} />
               )}
@@ -231,7 +234,10 @@ function AnalyticsContent() {
             <div className="panel overflow-x-auto">
               <h2 className="text-sm font-bold mb-3">Automation runs</h2>
               {a.automationPerformance.length === 0 ? (
-                <EmptyState title="No automation runs" copy="Runs appear when automations execute." />
+                <EmptyState
+                  title="No automation runs"
+                  copy="Runs appear when automations execute."
+                />
               ) : (
                 <table className="data-table">
                   <thead>
@@ -260,8 +266,8 @@ function AnalyticsContent() {
             <section className="panel mt-6 overflow-x-auto">
               <h2 className="text-sm font-bold mb-3">Conversations</h2>
               <p className="text-sm mb-2">
-                Open backlog: {a.conversationMetrics.unresolvedBacklog} · Human assigned in
-                period: {a.conversationMetrics.humanAssigned}
+                Open backlog: {a.conversationMetrics.unresolvedBacklog} · Human assigned in period:{" "}
+                {a.conversationMetrics.humanAssigned}
               </p>
               <table className="data-table">
                 <thead>

@@ -9,7 +9,9 @@ export type CanSendInput = {
   purpose: NotificationPurpose;
 };
 
-export async function canSendNotification(input: CanSendInput): Promise<{ allowed: boolean; reason?: string }> {
+export async function canSendNotification(
+  input: CanSendInput,
+): Promise<{ allowed: boolean; reason?: string }> {
   if (input.purpose === "TRANSACTIONAL" || input.purpose === "SUPPORT") {
     return { allowed: true };
   }

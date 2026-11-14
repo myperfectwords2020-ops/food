@@ -7,13 +7,11 @@ export async function register() {
     const { registerAutomationDomainHandlers } =
       await import("@/modules/automations/register-automation-domain-handlers");
     registerAutomationDomainHandlers();
-    const { registerNotificationDomainHandlers } = await import(
-      "@/modules/notifications/register-notification-domain-handlers"
-    );
+    const { registerNotificationDomainHandlers } =
+      await import("@/modules/notifications/register-notification-domain-handlers");
     registerNotificationDomainHandlers();
-    const { registerAnalyticsDomainHandlers } = await import(
-      "@/modules/analytics/register-analytics-domain-handlers"
-    );
+    const { registerAnalyticsDomainHandlers } =
+      await import("@/modules/analytics/register-analytics-domain-handlers");
     registerAnalyticsDomainHandlers();
   }
 }

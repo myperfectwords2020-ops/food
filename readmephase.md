@@ -62,11 +62,13 @@ Do not invent metrics unsupported by the stored data.
 Separate analytics into three layers:
 
 **Data sources**
+
 - PostgreSQL transactional records.
 - Existing domain events and execution records.
 - Existing queue and delivery records where applicable.
 
 **Analytics services**
+
 - RevenueAnalyticsService
 - OrderAnalyticsService
 - ProductAnalyticsService
@@ -78,6 +80,7 @@ Separate analytics into three layers:
 - NotificationAnalyticsService
 
 **Presentation**
+
 - Typed analytics DTOs.
 - Protected API routes or server actions following existing conventions.
 - TanStack Query hooks.
@@ -245,6 +248,7 @@ Implement measurable AI usage metrics such as:
 - Add-to-cart actions originating from the assistant, if attribution exists.
 
 Distinguish between:
+
 - Conversation count.
 - Message count.
 - Tool invocation count.
@@ -312,6 +316,7 @@ Implement:
 - Provider error summaries.
 
 Clearly distinguish:
+
 - Queued.
 - Sent.
 - Delivered.
@@ -636,6 +641,7 @@ Before completing:
 Provide:
 
 ### Implemented
+
 - Sales and revenue analytics.
 - Order analytics.
 - Product analytics.
@@ -649,21 +655,27 @@ Provide:
 - Exports, if implemented.
 
 ### Metric definitions
+
 Document important financial and conversion calculations.
 
 ### Database and performance
+
 Report relevant queries, indexes, caching, and performance considerations.
 
 ### Security
+
 Report authorization, tenant isolation, and privacy protections.
 
 ### Testing
+
 List commands executed and their actual results.
 
 ### Documentation
+
 List documents created or updated.
 
 ### Remaining issues
+
 List only genuine blockers, unsupported metrics, and provider/data limitations.
 
 Then STOP. Do not begin Phase 12 automatically.

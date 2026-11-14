@@ -133,9 +133,8 @@ const ACTIONS: Record<string, ActionDefinition> = {
           context: z.record(z.string(), z.unknown()).optional(),
         })
         .parse(input);
-      const { createAndQueueNotification } = await import(
-        "@/modules/notifications/notification.service"
-      );
+      const { createAndQueueNotification } =
+        await import("@/modules/notifications/notification.service");
       const result = await createAndQueueNotification({
         tenantId: ctx.tenantId,
         customerId: data.customerId ?? null,
@@ -170,9 +169,8 @@ const ACTIONS: Record<string, ActionDefinition> = {
           context: z.record(z.string(), z.unknown()).optional(),
         })
         .parse(input);
-      const { createAndQueueNotification } = await import(
-        "@/modules/notifications/notification.service"
-      );
+      const { createAndQueueNotification } =
+        await import("@/modules/notifications/notification.service");
       return createAndQueueNotification({
         tenantId: ctx.tenantId,
         customerId: data.customerId ?? null,

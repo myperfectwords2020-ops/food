@@ -64,9 +64,7 @@ export async function getProductAnalytics(
     byKey.set(key, existing);
   }
 
-  const topProducts = [...byKey.values()]
-    .sort((a, b) => b.revenue - a.revenue)
-    .slice(0, 20);
+  const topProducts = [...byKey.values()].sort((a, b) => b.revenue - a.revenue).slice(0, 20);
 
   let lowStockCount = 0;
   let outOfStockCount = 0;

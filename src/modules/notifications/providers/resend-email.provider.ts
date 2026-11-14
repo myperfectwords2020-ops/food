@@ -1,5 +1,8 @@
 import { getNotificationEnv } from "@/modules/notifications/notification-env";
-import type { EmailProvider, NotificationSendResult } from "@/modules/notifications/provider-interfaces";
+import type {
+  EmailProvider,
+  NotificationSendResult,
+} from "@/modules/notifications/provider-interfaces";
 
 export function createResendEmailProvider(): EmailProvider | null {
   const env = getNotificationEnv();

@@ -11,7 +11,10 @@ const TRANSITIONS: Record<NotificationStatus, NotificationStatus[]> = {
   CANCELLED: [],
 };
 
-export function assertNotificationStatusTransition(from: NotificationStatus, to: NotificationStatus) {
+export function assertNotificationStatusTransition(
+  from: NotificationStatus,
+  to: NotificationStatus,
+) {
   if (from === to) return;
   if (!TRANSITIONS[from].includes(to)) {
     throw new ValidationError(`Invalid notification status: ${from} → ${to}`);

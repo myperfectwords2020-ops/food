@@ -16,14 +16,14 @@ Transitions are validated in `src/modules/conversations/conversation-status.ts` 
 
 ## Message roles
 
-| Role | Customer API | Staff API |
-|------|--------------|-----------|
-| CUSTOMER | yes | yes |
-| AI | yes | yes |
-| HUMAN (staff reply) | yes | yes |
-| SYSTEM | yes | yes |
-| INTERNAL_NOTE | **never** | yes |
-| TOOL | no (metadata) | optional |
+| Role                | Customer API  | Staff API |
+| ------------------- | ------------- | --------- |
+| CUSTOMER            | yes           | yes       |
+| AI                  | yes           | yes       |
+| HUMAN (staff reply) | yes           | yes       |
+| SYSTEM              | yes           | yes       |
+| INTERNAL_NOTE       | **never**     | yes       |
+| TOOL                | no (metadata) | optional  |
 
 Sender identity is always derived from the authenticated request context.
 

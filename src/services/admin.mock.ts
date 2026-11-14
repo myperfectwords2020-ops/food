@@ -133,7 +133,10 @@ function filterConversations(
 }
 
 export const mockAdminService: AdminService = {
-  async getDashboard(_ctx: import("@/lib/auth/types").RequestContext, range?: AdminDateRange): Promise<DashboardMetrics> {
+  async getDashboard(
+    _ctx: import("@/lib/auth/types").RequestContext,
+    range?: AdminDateRange,
+  ): Promise<DashboardMetrics> {
     const resolved = range ?? "30d";
     const allOrders = await listAllOrders();
     const revenue = allOrders.reduce((s, o) => s + (o.paymentStatus === "paid" ? o.total : 0), 0);
@@ -421,7 +424,10 @@ export const mockAdminService: AdminService = {
     await mockAdminService.setAutomationEnabled(id, true);
   },
 
-  async getAnalytics(ctx: import("@/lib/auth/types").RequestContext, range?: AdminDateRange): Promise<AnalyticsSnapshot> {
+  async getAnalytics(
+    ctx: import("@/lib/auth/types").RequestContext,
+    range?: AdminDateRange,
+  ): Promise<AnalyticsSnapshot> {
     const resolved = range ?? "30d";
     const dash = await mockAdminService.getDashboard(ctx, resolved);
     return {

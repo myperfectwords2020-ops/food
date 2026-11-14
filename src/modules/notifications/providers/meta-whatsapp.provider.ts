@@ -1,5 +1,8 @@
 import { getNotificationEnv } from "@/modules/notifications/notification-env";
-import type { NotificationSendResult, WhatsAppProvider } from "@/modules/notifications/provider-interfaces";
+import type {
+  NotificationSendResult,
+  WhatsAppProvider,
+} from "@/modules/notifications/provider-interfaces";
 
 export function createMetaWhatsAppProvider(): WhatsAppProvider | null {
   const env = getNotificationEnv();
@@ -26,7 +29,12 @@ export function createMetaWhatsAppProvider(): WhatsAppProvider | null {
         const errText = await res.text();
         return {
           ok: false,
-          code: res.status === 429 ? "RATE_LIMITED" : res.status >= 500 ? "TRANSIENT_EXTERNAL_ERROR" : "PERMANENT_EXTERNAL_ERROR",
+          code:
+            res.status === 429
+              ? "RATE_LIMITED"
+              : res.status >= 500
+                ? "TRANSIENT_EXTERNAL_ERROR"
+                : "PERMANENT_EXTERNAL_ERROR",
           message: errText.slice(0, 200),
         };
       }

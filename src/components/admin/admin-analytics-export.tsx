@@ -36,7 +36,13 @@ export function AdminAnalyticsExport() {
   };
 
   return (
-    <Button type="button" variant="outline" size="sm" disabled={loading} onClick={() => void onExport()}>
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      disabled={loading}
+      onClick={() => void onExport()}
+    >
       {loading ? "Exporting…" : "Export CSV"}
     </Button>
   );

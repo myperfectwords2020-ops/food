@@ -44,13 +44,12 @@ export function dedupeSucceededPayments(rows: PaymentRow[]): PaymentRow[] {
   return [...byOrder.values()];
 }
 
-export function sumPaidRevenueByCurrency(
-  rows: PaymentRow[],
-): Record<string, number> {
+export function sumPaidRevenueByCurrency(rows: PaymentRow[]): Record<string, number> {
   const deduped = dedupeSucceededPayments(rows);
   const totals: Record<string, number> = {};
   for (const row of deduped) {
-    totals[row.currency] = (totals[row.currency] ?? 0) + fromMinorUnits(row.amountMinor, row.currency);
+    totals[row.currency] =
+      (totals[row.currency] ?? 0) + fromMinorUnits(row.amountMinor, row.currency);
   }
   return totals;
 }

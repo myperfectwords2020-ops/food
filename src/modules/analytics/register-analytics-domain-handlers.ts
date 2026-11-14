@@ -22,7 +22,9 @@ export function registerAnalyticsDomainHandlers() {
     const customerId = order?.customerId ?? payload.customerId;
     if (!order || !customerId) return;
 
-    const productIds = order.items.map((i) => i.productId).filter((id): id is string => Boolean(id));
+    const productIds = order.items
+      .map((i) => i.productId)
+      .filter((id): id is string => Boolean(id));
     if (productIds.length === 0) return;
 
     await attributeAssistantOrderIfEligible({

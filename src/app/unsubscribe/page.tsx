@@ -20,7 +20,10 @@ export default async function UnsubscribePage({ searchParams }: Props) {
     <main className="page-shell py-16 max-w-lg">
       <h1 className="page-title">Email preferences</h1>
       {result.ok ? (
-        <p role="status">You have been unsubscribed from marketing messages. Transactional emails may still be sent when required.</p>
+        <p role="status">
+          You have been unsubscribed from marketing messages. Transactional emails may still be sent
+          when required.
+        </p>
       ) : (
         <p className="text-destructive" role="alert">
           {result.error}

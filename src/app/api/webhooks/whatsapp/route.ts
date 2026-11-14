@@ -28,7 +28,11 @@ export async function POST(request: Request) {
 
   const rawBody = await request.text();
   try {
-    verifyMetaSignature(rawBody, request.headers.get("x-hub-signature-256"), env.whatsappWebhookSecret);
+    verifyMetaSignature(
+      rawBody,
+      request.headers.get("x-hub-signature-256"),
+      env.whatsappWebhookSecret,
+    );
   } catch {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
@@ -42,8 +46,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid payload." }, { status: 400 });
   }
 
-  const statuses =
-    payload.entry?.[0]?.changes?.[0]?.value?.statuses ?? [];
+  const statuses = payload.entry?.[0]?.changes?.[0]?.value?.statuses ?? [];
 
   for (const status of statuses) {
     const row = await prisma.notification.findFirst({

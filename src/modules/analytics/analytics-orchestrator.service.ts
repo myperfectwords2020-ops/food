@@ -61,29 +61,35 @@ export async function getAnalyticsSnapshot(
       getNotificationAnalytics(tenantId, range),
     ]);
 
-    const [priorLeads, priorNewCustomers, cumulativeEnd, cumulativePriorEnd, engagement, attribution] =
-      await Promise.all([
-        prisma.lead.count({
-          where: {
-            tenantId,
-            createdAt: { gte: range.priorStart, lt: range.priorEnd },
-          },
-        }),
-        prisma.customer.count({
-          where: {
-            tenantId,
-            createdAt: { gte: range.priorStart, lt: range.priorEnd },
-          },
-        }),
-        prisma.customer.count({
-          where: { tenantId, createdAt: { lt: range.end } },
-        }),
-        prisma.customer.count({
-          where: { tenantId, createdAt: { lt: range.priorEnd } },
-        }),
-        buildProductEngagementRows(tenantId, range, products.topProducts),
-        getAttributionMetrics(tenantId, range),
-      ]);
+    const [
+      priorLeads,
+      priorNewCustomers,
+      cumulativeEnd,
+      cumulativePriorEnd,
+      engagement,
+      attribution,
+    ] = await Promise.all([
+      prisma.lead.count({
+        where: {
+          tenantId,
+          createdAt: { gte: range.priorStart, lt: range.priorEnd },
+        },
+      }),
+      prisma.customer.count({
+        where: {
+          tenantId,
+          createdAt: { gte: range.priorStart, lt: range.priorEnd },
+        },
+      }),
+      prisma.customer.count({
+        where: { tenantId, createdAt: { lt: range.end } },
+      }),
+      prisma.customer.count({
+        where: { tenantId, createdAt: { lt: range.priorEnd } },
+      }),
+      buildProductEngagementRows(tenantId, range, products.topProducts),
+      getAttributionMetrics(tenantId, range),
+    ]);
 
     const snapshot: AnalyticsSnapshot = {
       dataSource: "live",

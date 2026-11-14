@@ -4,11 +4,11 @@ This document describes how server state is fetched and cached in the storefront
 
 ## When to use what
 
-| Layer | Use for |
-| --- | --- |
-| **Server Components** | Initial page data, SEO, auth-gated layouts, anything that does not need browser interactivity |
-| **TanStack Query** | Client-side server state that changes after mount: cart, checkout totals, admin tables/filters, mutations |
-| **Local React state** | UI-only state: open dialogs, hover, form fields before submit, debounced input staging |
+| Layer                 | Use for                                                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Server Components** | Initial page data, SEO, auth-gated layouts, anything that does not need browser interactivity             |
+| **TanStack Query**    | Client-side server state that changes after mount: cart, checkout totals, admin tables/filters, mutations |
+| **Local React state** | UI-only state: open dialogs, hover, form fields before submit, debounced input staging                    |
 
 TanStack Query manages **client-side server state**; it does not replace PostgreSQL, Next.js Server Components, authentication, or backend authorization.
 

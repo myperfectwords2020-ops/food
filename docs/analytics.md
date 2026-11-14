@@ -20,12 +20,12 @@ Presets: `7d`, `30d`, `90d` (URL `?range=`).
 
 ## Revenue KPIs
 
-| Metric | Definition |
-|--------|------------|
+| Metric                    | Definition                                                                                                                                                                  |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Verified paid revenue** | Sum of **SUCCEEDED** `Payment.amountMinor` with `paidAt` in range, **one payment per order** (latest `paidAt` wins). Display uses **NGN** major units via `fromMinorUnits`. |
-| **Paid orders** | Distinct orders with a counted succeeded payment in range. |
-| **AOV** | Verified paid revenue (NGN) ÷ paid orders. |
-| **Revenue trend** | Daily buckets by `paidAt` date (UTC). |
+| **Paid orders**           | Distinct orders with a counted succeeded payment in range.                                                                                                                  |
+| **AOV**                   | Verified paid revenue (NGN) ÷ paid orders.                                                                                                                                  |
+| **Revenue trend**         | Daily buckets by `paidAt` date (UTC).                                                                                                                                       |
 
 Rules:
 
@@ -61,13 +61,13 @@ Rules:
 
 Stored in `AnalyticsEvent` (migration `20261013120000_analytics_events`):
 
-| Event | Trigger |
-|-------|---------|
-| `PRODUCT_VIEW` | Product detail page load |
-| `STOREFRONT_ADD_TO_CART` | Add to bag / quick add (storefront) |
-| `ASSISTANT_ADD_TO_CART` | Quick add from assistant cards |
-| `ASSISTANT_RECOMMENDATION_CLICK` | Assistant product link click |
-| `ASSISTANT_ORDER_ATTRIBUTED` | Paid order with assistant touch in prior 30 days |
+| Event                            | Trigger                                          |
+| -------------------------------- | ------------------------------------------------ |
+| `PRODUCT_VIEW`                   | Product detail page load                         |
+| `STOREFRONT_ADD_TO_CART`         | Add to bag / quick add (storefront)              |
+| `ASSISTANT_ADD_TO_CART`          | Quick add from assistant cards                   |
+| `ASSISTANT_RECOMMENDATION_CLICK` | Assistant product link click                     |
+| `ASSISTANT_ORDER_ATTRIBUTED`     | Paid order with assistant touch in prior 30 days |
 
 Conversion % on engagement table = purchases ÷ views (same period).
 

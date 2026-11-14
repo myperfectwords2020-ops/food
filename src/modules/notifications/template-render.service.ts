@@ -59,7 +59,11 @@ export function renderTemplate(
   const bodyText = render(template.body);
   const subject = template.subject ? render(template.subject) : undefined;
   if (options?.html) {
-    return { ...(subject ? { subject } : {}), bodyText, bodyHtml: `<p>${bodyText.replace(/\n/g, "<br/>")}</p>` };
+    return {
+      ...(subject ? { subject } : {}),
+      bodyText,
+      bodyHtml: `<p>${bodyText.replace(/\n/g, "<br/>")}</p>`,
+    };
   }
   return { ...(subject ? { subject } : {}), bodyText };
 }

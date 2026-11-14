@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { renderTemplate, validateTemplateVariables } from "@/modules/notifications/template-render.service";
+import {
+  renderTemplate,
+  validateTemplateVariables,
+} from "@/modules/notifications/template-render.service";
 
 describe("notification template render", () => {
   it("renders allowed variables", () => {

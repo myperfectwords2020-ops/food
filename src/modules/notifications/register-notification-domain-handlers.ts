@@ -1,5 +1,8 @@
 import { DomainEventTypes, onDomainEvent } from "@/lib/events/domain-events";
-import { createAndQueueNotification, createInAppNotification } from "@/modules/notifications/notification.service";
+import {
+  createAndQueueNotification,
+  createInAppNotification,
+} from "@/modules/notifications/notification.service";
 import { prisma } from "@/lib/db/prisma";
 import { formatNaira } from "@/lib/format";
 import { fromMinorUnits } from "@/lib/money";
@@ -11,9 +14,8 @@ export function registerNotificationDomainHandlers() {
   registered = true;
 
   onDomainEvent(DomainEventTypes.ORDER_PAID, async (event) => {
-    const { ensureDefaultNotificationTemplates } = await import(
-      "@/modules/notifications/notification-template.service"
-    );
+    const { ensureDefaultNotificationTemplates } =
+      await import("@/modules/notifications/notification-template.service");
     await ensureDefaultNotificationTemplates(event.tenantId);
 
     const payload = event.payload as { orderId?: string; customerId?: string };

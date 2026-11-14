@@ -23,9 +23,7 @@ export function ProductViewTracker({ productId }: { productId: string }) {
     if (sent.current) return;
     sent.current = true;
     const sessionKey = getOrCreateSessionKey();
-    void recordProductViewAction(
-      sessionKey ? { productId, sessionKey } : { productId },
-    );
+    void recordProductViewAction(sessionKey ? { productId, sessionKey } : { productId });
   }, [productId]);
 
   return null;

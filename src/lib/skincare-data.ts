@@ -102,8 +102,7 @@ export const products: Product[] = [
     slug: "velvet-matte-lipstick",
     name: "Velvet Matte Lipstick",
     category: "Lipstick",
-    description:
-      "Rich pigment with a soft matte finish that stays comfortable through the day.",
+    description: "Rich pigment with a soft matte finish that stays comfortable through the day.",
     price: 9800,
     image: catalogImageForProduct("velvet-matte-lipstick", "Lipstick"),
     concern: "Color payoff",

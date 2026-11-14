@@ -41,11 +41,11 @@ The free ngrok URL changes when you restart the tunnel unless you use a reserved
 
 ## API
 
-| Surface | Purpose |
-|--------|---------|
-| `initializePaymentAction(orderId)` | Customer-owned order, server amount |
-| `verifyPaymentAction(orderId, reference?)` | Server-side Paystack verify |
-| `POST /api/webhooks/paystack` | Provider events (`charge.success`, `charge.failed`) |
+| Surface                                    | Purpose                                             |
+| ------------------------------------------ | --------------------------------------------------- |
+| `initializePaymentAction(orderId)`         | Customer-owned order, server amount                 |
+| `verifyPaymentAction(orderId, reference?)` | Server-side Paystack verify                         |
+| `POST /api/webhooks/paystack`              | Provider events (`charge.success`, `charge.failed`) |
 
 ## Security
 

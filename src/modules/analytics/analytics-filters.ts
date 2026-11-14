@@ -44,11 +44,7 @@ export function resolveAnalyticsRange(
   const priorStart = addUtcDays(priorEnd, -days);
 
   const label =
-    preset === "7d"
-      ? "Last 7 days"
-      : preset === "90d"
-        ? "Last 90 days"
-        : "Last 30 days";
+    preset === "7d" ? "Last 7 days" : preset === "90d" ? "Last 90 days" : "Last 30 days";
 
   return { preset, start, end, priorStart, priorEnd, label };
 }

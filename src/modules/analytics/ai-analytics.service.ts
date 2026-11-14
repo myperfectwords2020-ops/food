@@ -65,9 +65,7 @@ export async function getAIAnalytics(
   ]);
 
   const handoffRate =
-    conversationsStarted > 0
-      ? Math.round((handoffRequests / conversationsStarted) * 1000) / 10
-      : 0;
+    conversationsStarted > 0 ? Math.round((handoffRequests / conversationsStarted) * 1000) / 10 : 0;
 
   return {
     conversationsStarted,
