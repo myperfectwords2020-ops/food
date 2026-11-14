@@ -7,6 +7,7 @@ import { AdminPageHeader } from "@/components/admin/admin-page-header";
 import { OrderAdminActions } from "@/components/admin/order-admin-actions";
 import { Status } from "@/components/page-ui";
 import { formatNaira } from "@/lib/format";
+import { getAdminOrderStatusOptions } from "@/modules/orders/admin-order.service";
 import { adminService } from "@/services/index";
 
 type Props = { params: Promise<{ id: string }> };
@@ -15,6 +16,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
   const { id } = await params;
   const order = await adminService.getOrder(id);
   if (!order) notFound();
+  const nextStatusOptions = getAdminOrderStatusOptions(order.status);
 
   return (
     <>
@@ -39,6 +41,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
         customerEmail={order.customer.email}
         paymentReference={order.paymentReference}
         initialStatus={order.status}
+        nextStatusOptions={nextStatusOptions}
       />
       <div className="admin-grid mt-4">
         <section className="panel" id="payment-panel">

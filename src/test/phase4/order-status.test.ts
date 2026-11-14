@@ -2,16 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { OrderStatus } from "@prisma/client";
 
-const transitions: Record<OrderStatus, OrderStatus[]> = {
-  PENDING_PAYMENT: ["PAID", "CANCELLED", "FAILED"],
-  PAID: ["PROCESSING", "CANCELLED"],
-  PROCESSING: ["SHIPPED", "CANCELLED"],
-  SHIPPED: ["DELIVERED"],
-  DELIVERED: [],
-  CANCELLED: [],
-  FAILED: [],
-  REFUNDED: [],
-};
+import { ORDER_STATUS_TRANSITIONS as transitions } from "@/modules/orders/order-status.service";
 
 describe("order status policy", () => {
   it("does not allow delivered to pending", () => {

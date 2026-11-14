@@ -5,41 +5,26 @@ import { tenantScopeWhere } from "@/lib/db/tenant-query";
 import { fromMinorUnits } from "@/lib/money";
 import { NotFoundError, ValidationError } from "@/lib/errors/app-error";
 import { toCommerceOrder } from "@/modules/orders/order.mapper";
+import {
+  ORDER_STATUS_LABELS,
+  commerceOrderStatusToPrisma,
+  prismaOrderStatusToCommerce,
+} from "@/modules/orders/order-status-map";
+import {
+  adminSelectableOrderTargets,
+  transitionOrderStatusToTarget,
+} from "@/modules/orders/order-status.service";
 import type { AdminOrderDetail, AdminOrderFilters, AdminOrderListItem } from "@/types/admin";
 import type { OrderStatus } from "@/types/commerce";
 
 const PAGE_SIZE = 50;
 
 function mapFilterStatus(status: OrderStatus): import("@prisma/client").OrderStatus | undefined {
-  switch (status) {
-    case "pending_payment":
-      return "PENDING_PAYMENT";
-    case "paid":
-      return "PAID";
-    case "processing":
-      return "PROCESSING";
-    case "shipped":
-      return "SHIPPED";
-    case "delivered":
-      return "DELIVERED";
-    case "cancelled":
-      return "CANCELLED";
-    case "refunded":
-      return "REFUNDED";
-    default:
-      return undefined;
+  try {
+    return commerceOrderStatusToPrisma(status);
+  } catch {
+    return undefined;
   }
-}
-
-function mapListStatus(status: string): OrderStatus {
-  if (status === "PENDING_PAYMENT") return "pending_payment";
-  if (status === "PAID") return "processing";
-  if (status === "PROCESSING") return "processing";
-  if (status === "SHIPPED") return "shipped";
-  if (status === "DELIVERED") return "delivered";
-  if (status === "CANCELLED") return "cancelled";
-  if (status === "REFUNDED") return "refunded";
-  return "processing";
 }
 
 export async function listAdminOrders(context: RequestContext, filters?: AdminOrderFilters) {
@@ -86,7 +71,7 @@ export async function listAdminOrders(context: RequestContext, filters?: AdminOr
     customerEmail: o.customerEmail,
     itemCount: o.items.reduce((s, i) => s + i.quantity, 0),
     total: fromMinorUnits(o.totalMinor, o.currency),
-    status: mapListStatus(o.status),
+    status: prismaOrderStatusToCommerce(o.status),
     paymentStatus: o.payments[0]?.status === "SUCCEEDED" ? "paid" : "pending",
     createdAt: o.createdAt.toISOString(),
     displayDate: o.createdAt.toLocaleDateString("en-NG"),
@@ -133,6 +118,14 @@ export async function getAdminOrderDetail(context: RequestContext, orderId: stri
       detail: succeededPayment.providerReference ?? undefined,
     });
   }
+  const commerceStatus = prismaOrderStatusToCommerce(order.status);
+  if (commerceStatus !== "pending_payment" && commerceStatus !== "paid") {
+    timeline.push({
+      id: "fulfillment",
+      label: `Fulfillment: ${ORDER_STATUS_LABELS[commerceStatus]}`,
+      at: order.updatedAt.toISOString(),
+    });
+  }
 
   const detail: AdminOrderDetail = {
     ...commerce,
@@ -141,6 +134,20 @@ export async function getAdminOrderDetail(context: RequestContext, orderId: stri
     paymentReference: referencePayment?.providerReference ?? undefined,
   };
   return detail;
+}
+
+export function getAdminOrderStatusOptions(currentStatus: OrderStatus): OrderStatus[] {
+  const prismaStatus = commerceOrderStatusToPrisma(currentStatus);
+  return adminSelectableOrderTargets(prismaStatus).map(prismaOrderStatusToCommerce);
+}
+
+export async function updateAdminOrderStatus(
+  context: RequestContext,
+  orderId: string,
+  nextStatus: OrderStatus,
+) {
+  const prismaNext = commerceOrderStatusToPrisma(nextStatus);
+  await transitionOrderStatusToTarget(context, orderId, prismaNext);
 }
 
 export async function getOrderForCustomerAccess(

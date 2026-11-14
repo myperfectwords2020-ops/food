@@ -1,10 +1,25 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+
 import { requireRequestContext } from "@/lib/auth/request-context";
 import { AppError, normalizeError } from "@/lib/errors/app-error";
+import { updateAdminOrderStatus } from "@/modules/orders/admin-order.service";
 import { uploadAdminProductImage } from "@/modules/products/product-image.service";
 import { adminService } from "@/services/index";
 import type { AdminProductImage, AdminProductStatus } from "@/types/admin";
+import type { OrderStatus } from "@/types/commerce";
+
+const orderStatusSchema = z.enum([
+  "pending_payment",
+  "paid",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "refunded",
+]);
 
 export async function uploadAdminProductImageAction(
   formData: FormData,
@@ -141,4 +156,28 @@ export async function publishAutomationAction(id: string) {
 
 export async function toggleAutomationAction(id: string, enabled: boolean) {
   await adminService.setAutomationEnabled(id, enabled);
+}
+
+export async function updateAdminOrderStatusAction(
+  orderId: string,
+  nextStatus: OrderStatus,
+): Promise<{ ok: true; status: OrderStatus } | { ok: false; error: string }> {
+  const parsedStatus = orderStatusSchema.safeParse(nextStatus);
+  if (!parsedStatus.success || !orderId.trim()) {
+    return { ok: false, error: "Invalid status." };
+  }
+
+  try {
+    const ctx = await requireRequestContext();
+    await updateAdminOrderStatus(ctx, orderId, parsedStatus.data);
+    revalidatePath(`/admin/orders/${orderId}`);
+    revalidatePath("/admin/orders");
+    return { ok: true, status: parsedStatus.data };
+  } catch (error) {
+    const normalized = normalizeError(error);
+    if (normalized instanceof AppError && normalized.expose) {
+      return { ok: false, error: normalized.message };
+    }
+    return { ok: false, error: "Could not update order status." };
+  }
 }
